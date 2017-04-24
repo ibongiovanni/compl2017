@@ -20,10 +20,10 @@ read JSt;
     J := hd JSt;
     Store := tl JSt;
     while J do
-        J := pred K;
+        J := pred J;
         Store := tl Store;
     od;
-    X := hd T;
+    X := hd Store;
 write X;
 
 prog update:
@@ -31,7 +31,7 @@ prog update:
 read JVSt; 
     J := hd JVSt;
     V := hd (tl JVSt);
-    St := hd (tl (tl JVSt));
+    St := tl (tl JVSt);
     T := nil;                   (* Store := update J V Store *)
     K := J;
     while K do                  (* net effect is to set... *)
@@ -44,22 +44,21 @@ read JVSt;
         St := cons (hd T) St;
         T := tl T;
     od;
-    X := Store;
-write X;
+write St;
 
 prog main:
 
 read PD;
-    Pgm := hd PD;
-    D := tl PD;
-    I := hd (tl (hd Pgm));
-    J := hd (tl (hd (tl (tl Pgm))));
-    C := hd (tl Pgm);
-    IDnil := cons I (cons D nil);
-    Vl := update IDnil;
-    Cd := cons C nil;
-    St := nil;
-    while Cd do
+    Pgm := hd PD;                   (* p = ((var i) c (var j)) *)
+    D := tl PD;                     (* D = d (input value) *)
+    I := hd (tl (hd Pgm));          (* I = i (input variable) *)
+    J := hd (tl (hd (tl (tl Pgm))));(* J = j (output variable) *)
+    C := hd (tl Pgm);               (* C = c (program code) *)
+    IDnil := cons I (cons D nil); 
+    Vl := update IDnil;             (* (var i) initially d, others nil *)
+    Cd := cons C nil;               (* Cd = (c.nil), Code to execute is c *)
+    St := nil;                      (* St = nil, computation Stack empty *)
+    while Cd do                     (* do while there is code to execute *)
         rewrite [Cd , St] by
             [(('quote'.D).Cr)  ,     St] ==> St := cons D St ; Cd := Cr;
             [(('var'.J).Cr) ,     St] ==> Cd := Cr; JVl := cons J Vl; X := lookup JVl; St:=cons X St;
@@ -81,6 +80,6 @@ read PD;
         end;
     od;
     JVl := cons J Vl;
-    Out := lookup JVl;
+    Out := lookup JVl;  (* Output is the value of (var j) *)
 write Out;
 

@@ -1,0 +1,3 @@
+read A;
+	Y := A;
+write Y;

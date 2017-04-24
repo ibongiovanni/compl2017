@@ -1,0 +1,27 @@
+prog main:
+
+read D;
+  (*start*)
+	L:= nil;
+	N:= (nil);
+	New := hd N;
+  (*/start*)
+	GO := true;
+	while GO do
+		Y:= p New; (* p=???? *)
+		if (=? Y D) then GO := false;
+	  (*next*)
+		N := tl N;
+		Old := L;
+		Tmp := cons (cons New New) nil;
+		while Old do
+			Tmp := cons (cons New (hd Old)) Tmp;
+			Tmp := cons (cons (hd Old) New) Tmp;
+			Old := tl Old;
+		od;
+		N := append N Tmp;
+		L := cons New L;
+		New := hd N;
+	  (*/next*)
+	od;
+write true;

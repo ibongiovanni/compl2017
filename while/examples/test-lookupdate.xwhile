@@ -1,0 +1,69 @@
+(* Intérprete de While en While, extendido para programas que tengan mas de una única variable. *)
+
+pattern dohd   ;
+pattern dotl   ;
+pattern docons ;
+pattern doeq   ;
+pattern doasgn ;
+pattern dowh   ;
+
+
+prog pred:
+
+read X;
+    Y:= tl X;
+write Y;
+
+prog succ:
+
+read X;
+    Y := cons nil X;
+write Y;
+
+prog lookup:
+
+read JSt;
+    J := hd JSt;
+    Store := tl JSt;
+    while J do
+        J := pred J;
+        Store := tl Store;
+    od;
+    X := hd Store;
+write X;
+
+prog update:
+
+read JVSt; 
+    J := hd JVSt;
+    V := hd (tl JVSt);
+    St := tl (tl JVSt);
+    T := nil;                   (* Store := update J V Store *)
+    K := J;
+    while K do                  (* net effect is to set... *)
+        T := cons (hd St) T;    (* ... T=(dj-1...d0) and...*)
+        St := tl St;            (* ... St=(dj dj+1...dn *)
+        K := pred K;
+    od;
+    St := cons V (tl St);   (* St = (V dj+1...dn) *)
+    while T do
+        St := cons (hd T) St;
+        T := tl T;
+    od;
+write St;
+
+prog main:
+
+(* St = (nil.((nil.(nil.nil)).(nil.((nil.nil).nil)))) *)
+read St;
+    J := nil;
+    J := succ J; (* J=1 *)
+    JSt := cons J St;
+    Y := lookup JSt;
+    (* Y= (nil . (nil . nil))  *)
+
+    J := succ J; (* J=2 *)
+    JVSt := cons J (cons Y St);
+    Y := update JVSt; 
+write Y;
+
